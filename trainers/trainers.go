@@ -41,5 +41,14 @@ var Trainers = []*Trainer{
 			{Name: "Rubberduck", Level: 1},
 			{Name: "Magikarp", Level: 19},
 		},
+	}, {
+		Name: "Fisherman Steve",
+		Pokemon: []*Pokemon{
+			{Name: "Magikarp", Level: 5},
+			{Name: "Magikarp", Level: 5},
+			{Name: "Magikarp", Level: 5},
+			{Name: "Magikarp", Level: 5},
+			{Name: "Psyduck", Level: 19},
+		},
 	},
 }

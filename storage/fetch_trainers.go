@@ -18,7 +18,8 @@ type TrainerSearchOpts struct {
 
 // FetchTrainers queries trainers with the passed options
 func (s *Store) FetchTrainers(ops TrainerSearchOpts) ([]*trainers.Trainer, error) {
-	query := elastic.NewMatchAllQuery()
+	query := elastic.NewBoolQuery()
+	query = query.Filter(buildFilters(ops)...)
 
 	res, err := s.es.Search(s.trainerIndex).Type(s.trainerType).Query(query).Do()
 	if err != nil {
@@ -30,4 +31,17 @@ func (s *Store) FetchTrainers(ops TrainerSearchOpts) ([]*trainers.Trainer, error
 		trns = append(trns, iT.(*trainers.Trainer))
 	}
 	return trns, nil
+}
+
+func buildFilters(opts TrainerSearchOpts) []elastic.Query {
+	return []elastic.Query{
+		elastic.NewNestedQuery("pokemon", buildPokemonFilter(opts)),
+	}
+}
+
+func buildPokemonFilter(opts TrainerSearchOpts) elastic.Query {
+	return elastic.NewBoolQuery().Filter(
+		elastic.NewMatchQuery("pokemon.name", opts.Pokemon),
+		elastic.NewMatchQuery("pokemon.level", opts.Level),
+	)
 }
