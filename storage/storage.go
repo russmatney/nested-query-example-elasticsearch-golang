@@ -12,7 +12,7 @@ import (
 
 // Storage is the exposed interface for use in other packages
 type Storage interface {
-	FetchTrainers(TrainerSearchOpts) (*trainers.Trainer, error)
+	FetchTrainers(TrainerSearchOpts) ([]*trainers.Trainer, error)
 	SaveTrainer(string, *trainers.Trainer) error
 }
 
@@ -48,6 +48,14 @@ func NewStore(assetsPath, indexName, esURL string) Storage {
 
 // Bootstrap applies settings to the elasticsearch index
 func (s *Store) bootstrap(settingsPath, indexName string) error {
+	exists, err := s.es.IndexExists(indexName).Do()
+	if err != nil {
+		return err
+	}
+	if exists {
+		return nil
+	}
+
 	settings, err := ioutil.ReadFile(settingsPath)
 	if err != nil {
 		return err
@@ -56,17 +64,11 @@ func (s *Store) bootstrap(settingsPath, indexName string) error {
 	if err != nil {
 		return err
 	}
-	exists, err := s.es.IndexExists(indexName).Do()
-	if err != nil {
-		return err
-	}
-	if exists {
-		return nil
-	}
 	_, err = s.es.CreateIndex(indexName).BodyString(string(json)).Do()
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -77,19 +79,4 @@ func (s *Store) SaveTrainer(id string, trainer *trainers.Trainer) error {
 		return err
 	}
 	return nil
-}
-
-//////////////////////////////////////////////////////////
-// Trainer search
-//////////////////////////////////////////////////////////
-
-// TrainerSearchOpts is an exposed object to help build a search query
-type TrainerSearchOpts struct {
-	Pokemon string
-	Level   int
-}
-
-// FetchTrainers queries trainers with the passed options
-func (s *Store) FetchTrainers(ops TrainerSearchOpts) (*trainers.Trainer, error) {
-	panic("not implemented")
 }

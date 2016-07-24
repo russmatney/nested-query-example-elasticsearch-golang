@@ -1,5 +1,7 @@
 package trainers
 
+import "fmt"
+
 // Pokemon defines the structure of a trainer's pokemon
 type Pokemon struct {
 	Name  string `json:"name"`
@@ -10,6 +12,14 @@ type Pokemon struct {
 type Trainer struct {
 	Name    string     `json:"name"`
 	Pokemon []*Pokemon `json:"pokemon"`
+}
+
+func (t *Trainer) String() string {
+	sum := fmt.Sprintf("\n\tTrainer: %s, Pokemon (%d):", t.Name, len(t.Pokemon))
+	for _, pk := range t.Pokemon {
+		sum = fmt.Sprintf("%s\n\t\t[ Name: %s, Level: %d ]", sum, pk.Name, pk.Level)
+	}
+	return sum
 }
 
 // Trainers is local example data
@@ -24,6 +34,12 @@ var Trainers = []*Trainer{
 		Name: "Brock",
 		Pokemon: []*Pokemon{
 			{Name: "Goldar", Level: 9000},
+		},
+	}, {
+		Name: "Misty",
+		Pokemon: []*Pokemon{
+			{Name: "Rubberduck", Level: 1},
+			{Name: "Magikarp", Level: 19},
 		},
 	},
 }

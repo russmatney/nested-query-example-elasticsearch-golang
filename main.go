@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-
+	log "github.com/Sirupsen/logrus"
 	"github.com/russmatney/nested-query-example-elasticsearch-golang/storage"
 	"github.com/russmatney/nested-query-example-elasticsearch-golang/trainers"
 )
@@ -14,14 +13,29 @@ const (
 )
 
 func main() {
-	fmt.Println("Creating store")
+	log.Info("Creating store")
 	store := storage.NewStore(assetsPath, indexName, elasticHost)
 
-	fmt.Println("Saving mock data to elasticsearch")
+	log.Info("Saving mock data to elasticsearch")
 	for _, t := range trainers.Trainers {
 		if err := store.SaveTrainer(t.Name, t); err != nil {
 			panic(err)
 		}
 	}
 
+	log.Info("Searching for trainers")
+	searchForMagikarp(store)
+}
+
+func searchForMagikarp(store storage.Storage) {
+	magikarpSearch := storage.TrainerSearchOpts{
+		Pokemon: "Magikarp",
+		Level:   19,
+	}
+	trainers, _ := store.FetchTrainers(magikarpSearch)
+
+	log.WithFields(log.Fields{
+		"search":   magikarpSearch,
+		"trainers": trainers,
+	}).Info("Trainers found for search")
 }
