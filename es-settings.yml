@@ -1,0 +1,14 @@
+mappings:
+  trainer:
+    properties:
+      name:
+        type: string
+      hometown:
+        type: string
+      pokemon:
+        type: nested
+        properties:
+          name:
+            type: string
+          level:
+            type: long
